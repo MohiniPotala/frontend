@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test OTP API</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type="email"],
+      input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+      button {
+        padding: 10px 15px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #result {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        min-height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test OTP API</h1>
+
+    <div class="form-group">
+      <label for="apiUrl">API URL:</label>
+      <input
+        type="text"
+        id="apiUrl"
+        value="http://127.0.0.1:8000/api/auth/request-otp"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="Enter your email" />
+    </div>
+
+    <button onclick="requestOtp()">Request OTP</button>
+
+    <div id="result">
+      <p>Results will appear here...</p>
+    </div>
+
+    <script>
+      async function requestOtp() {
+        const apiUrl = document.getElementById("apiUrl").value;
+        const email = document.getElementById("email").value;
+        const resultDiv = document.getElementById("result");
+
+        if (!email) {
+          resultDiv.innerHTML =
+            '<p style="color: red;">Please enter an email address</p>';
+          return;
+        }
+
+        resultDiv.innerHTML = "<p>Sending request...</p>";
+
+        try {
+          // Using fetch API
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ email: email }),
+          });
+
+          const data = await response.json();
+
+          resultDiv.innerHTML = `
+                    <h3>Response:</h3>
+                    <p>Status: ${response.status}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+
+          // Also try with XMLHttpRequest as a fallback
+          resultDiv.innerHTML +=
+            "<h3>Testing with XMLHttpRequest:</h3><p>Sending...</p>";
+          testWithXhr(apiUrl, email);
+        } catch (error) {
+          resultDiv.innerHTML = `
+                    <h3>Error:</h3>
+                    <p style="color: red;">${error.message}</p>
+                    <p>Trying with XMLHttpRequest as fallback...</p>
+                `;
+
+          // Try with XMLHttpRequest as a fallback
+          testWithXhr(apiUrl, email);
+        }
+      }
+
+      function testWithXhr(apiUrl, email) {
+        const resultDiv = document.getElementById("result");
+        const xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            let xhrResult = "";
+            try {
+              const response = JSON.parse(xhr.responseText);
+              xhrResult = `
+                            <p>Status: ${xhr.status}</p>
+                            <pre>${JSON.stringify(response, null, 2)}</pre>
+                        `;
+            } catch (e) {
+              xhrResult = `
+                            <p>Status: ${xhr.status}</p>
+                            <p>Response: ${xhr.responseText}</p>
+                            <p>Error parsing JSON: ${e.message}</p>
+                        `;
+            }
+
+            resultDiv.innerHTML += `
+                        <div>
+                            <h4>XMLHttpRequest Result:</h4>
+                            ${xhrResult}
+                        </div>
+                    `;
+          }
+        };
+
+        xhr.open("POST", apiUrl, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.send(JSON.stringify({ email: email }));
+      }
+    </script>
+  </body>
+</html>

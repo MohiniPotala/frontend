@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Generate PNG</title>
+  </head>
+  <body>
+    <canvas
+      id="logoCanvas"
+      width="150"
+      height="150"
+      style="border: 1px solid #d3d3d3"
+    ></canvas>
+    <canvas
+      id="faviconCanvas"
+      width="32"
+      height="32"
+      style="border: 1px solid #d3d3d3"
+    ></canvas>
+    <script>
+      // Generate logo
+      const logoCanvas = document.getElementById("logoCanvas");
+      const logoCtx = logoCanvas.getContext("2d");
+      logoCtx.fillStyle = "#3498db";
+      logoCtx.fillRect(0, 0, 150, 150);
+      logoCtx.fillStyle = "white";
+      logoCtx.font = "24px Arial";
+      logoCtx.textAlign = "center";
+      logoCtx.fillText("LOGO", 75, 80);
+
+      // Generate favicon
+      const faviconCanvas = document.getElementById("faviconCanvas");
+      const faviconCtx = faviconCanvas.getContext("2d");
+      faviconCtx.fillStyle = "#e74c3c";
+      faviconCtx.fillRect(0, 0, 32, 32);
+
+      // Download images
+      console.log(
+        'Right-click on each image and select "Save image as..." to download'
+      );
+      console.log('Save the logo as "logo.png" in src/assets/');
+      console.log('Save the favicon as "favicon.png" in src/assets/');
+    </script>
+  </body>
+</html>
